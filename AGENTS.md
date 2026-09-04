@@ -16,7 +16,7 @@
 
 # Commands
 
-- Install dependencies: TBD
-- Run migrations: TBD
-- Run development server: TBD
+- Install dependencies: `uv sync`
+- Run migrations: `uv run python manage.py migrate`
+- Run development server: `uv run python manage.py runserver`
 - Run tests: `uv run python manage.py test`
