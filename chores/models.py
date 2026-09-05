@@ -85,18 +85,40 @@ class Member(models.Model):
 
     def clean(self):
         super().clean()
-        if (
-            self.pk
-            and not self.is_active
-            and Household.objects.filter(leader_id=self.pk).exists()
-        ):
-            raise ValidationError(
-                {"is_active": "The household leader must remain active."}
-            )
+        if self.pk and not self.is_active:
+            if Household.objects.filter(leader_id=self.pk).exists():
+                raise ValidationError(
+                    {"is_active": "The household leader must remain active."}
+                )
+            if self.assigned_chores.exclude(
+                status=Chore.Status.COMPLETED
+            ).exists():
+                raise ValidationError(
+                    {
+                        "is_active": (
+                            "A member with assigned non-completed chores "
+                            "cannot be deactivated."
+                        )
+                    }
+                )
 
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
+
+    def deactivate(self):
+        """Deactivate a regular member after checking all domain guards."""
+        if self._state.adding:
+            raise ValidationError(
+                {"is_active": "An unsaved member cannot be deactivated."}
+            )
+
+        with transaction.atomic():
+            stored_member = type(self).objects.select_for_update().get(pk=self.pk)
+            stored_member.is_active = False
+            stored_member.save(update_fields={"is_active"})
+
+        self.is_active = False
 
     def __str__(self):
         return self.name

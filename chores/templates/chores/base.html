@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Shared Household Chores{% endblock %}</title>
+  </head>
+  <body>
+    <header>
+      <h1><a href="{% url 'chores:home' %}">Shared Household Chores</a></h1>
+      {% if current_household %}
+        <p>Household: <strong>{{ current_household.name }}</strong></p>
+        <form method="post" action="{% url 'chores:set_current_member' %}">
+          {% csrf_token %}
+          {{ current_member_form.member.label_tag }}
+          {{ current_member_form.member }}
+          <button type="submit">Select</button>
+          {{ current_member_form.member.errors }}
+        </form>
+        {% if current_member %}
+          <p>Acting as: <strong>{{ current_member.name }}</strong></p>
+          {% if current_member.is_leader %}
+            <p><a href="{% url 'chores:member_list' %}">Manage members</a></p>
+          {% endif %}
+        {% else %}
+          <p>Choose an active Current Member to continue.</p>
+        {% endif %}
+      {% endif %}
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

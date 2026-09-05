@@ -1,0 +1,13 @@
+{% extends "chores/base.html" %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+  <h2>{{ form_title }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="{% url 'chores:member_list' %}">Back to members</a></p>
+{% endblock %}

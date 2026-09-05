@@ -1,3 +1,7 @@
 """URL configuration for the household_chores project."""
 
-urlpatterns = []
+from django.urls import include, path
+
+urlpatterns = [
+    path("", include("chores.urls")),
+]

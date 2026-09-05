@@ -1,0 +1,29 @@
+{% extends "chores/base.html" %}
+
+{% block title %}Manage members{% endblock %}
+
+{% block content %}
+  <h2>Manage members</h2>
+  {% if deactivation_error %}
+    <p role="alert">{{ deactivation_error }}</p>
+  {% endif %}
+  <p><a href="{% url 'chores:member_add' %}">Add member</a></p>
+  <ul>
+    {% for member in members %}
+      <li>
+        {{ member.name }}
+        {% if member.pk == leader_id %}(Leader){% endif %}
+        {% if not member.is_active %}(Inactive){% endif %}
+        — <a href="{% url 'chores:member_rename' member.pk %}">Rename</a>
+        {% if member.is_active and member.pk != leader_id %}
+          <form method="post" action="{% url 'chores:member_deactivate' member.pk %}">
+            {% csrf_token %}
+            <button type="submit">Deactivate</button>
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No members found.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

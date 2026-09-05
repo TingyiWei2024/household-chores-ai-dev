@@ -1,0 +1,9 @@
+{% extends "chores/base.html" %}
+
+{% block content %}
+  {% if current_household %}
+    <p>This is the shared page for {{ current_household.name }}.</p>
+  {% else %}
+    <p>The household has not been initialized yet.</p>
+  {% endif %}
+{% endblock %}
