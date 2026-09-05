@@ -21,6 +21,19 @@ uv sync
 uv run python manage.py migrate
 ```
 
+## Create the initial household and leader
+
+After migrating a clean local/development database, bootstrap the MVP's single
+household and its leader with:
+
+```shell
+uv run python manage.py bootstrap_household \
+  --household-name "My Household" \
+  --leader-name "Household Leader"
+```
+
+Running the command again leaves the existing household unchanged.
+
 ## Run the development server
 
 ```shell
