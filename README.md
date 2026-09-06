@@ -42,6 +42,18 @@ uv run python manage.py runserver
 
 The development server starts at <http://127.0.0.1:8000/> by default.
 
+## Try creating and editing chores
+
+Select the household Leader in **Current Member** and use **Manage members** to
+add regular members. Select the member you want to act as, then choose **Create
+chore**. Enter a title, optionally fill in the description and due date, and
+choose an active assignee or **Unassigned**. Saving opens the chore's details.
+
+The home page links to household chore details. **Edit chore** is available to
+the creator, current assignee, or Leader while the chore is Open or In Progress.
+Other members can view its details. Completed chores are read-only. This task
+does not yet provide claiming, status changes, History, or board indicators.
+
 ## Run tests
 
 ```shell

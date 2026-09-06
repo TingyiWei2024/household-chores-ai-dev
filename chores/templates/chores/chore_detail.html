@@ -1,0 +1,29 @@
+{% extends "chores/base.html" %}
+
+{% block title %}{{ chore.title }}{% endblock %}
+
+{% block content %}
+  <h2>{{ chore.title }}</h2>
+  <dl>
+    <dt>Description</dt>
+    <dd>{{ chore.description|default:"No description"|linebreaksbr }}</dd>
+    <dt>Creator</dt>
+    <dd>{{ chore.creator.name }}</dd>
+    <dt>Assignee</dt>
+    <dd>{% if chore.assignee %}{{ chore.assignee.name }}{% else %}Unassigned{% endif %}</dd>
+    <dt>Status</dt>
+    <dd>{{ chore.get_status_display }}</dd>
+    <dt>Due date</dt>
+    <dd>{% if chore.due_date %}{{ chore.due_date|date:"Y-m-d" }}{% else %}No due date{% endif %}</dd>
+    <dt>Created at</dt>
+    <dd><time datetime="{{ chore.created_at|date:'c' }}">{{ chore.created_at|date:"Y-m-d H:i:s T" }}</time></dd>
+    {% if chore.completed_at %}
+      <dt>Completed at</dt>
+      <dd><time datetime="{{ chore.completed_at|date:'c' }}">{{ chore.completed_at|date:"Y-m-d H:i:s T" }}</time></dd>
+    {% endif %}
+  </dl>
+  {% if can_edit %}
+    <p><a href="{% url 'chores:chore_edit' chore.pk %}">Edit chore</a></p>
+  {% endif %}
+  <p><a href="{% url 'chores:home' %}">Back to home</a></p>
+{% endblock %}

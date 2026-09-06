@@ -3,6 +3,16 @@
 {% block content %}
   {% if current_household %}
     <p>This is the shared page for {{ current_household.name }}.</p>
+    {% if current_member %}
+      <h2>Chores</h2>
+      <ul>
+        {% for chore in chores %}
+          <li><a href="{% url 'chores:chore_detail' chore.pk %}">{{ chore.title }}</a></li>
+        {% empty %}
+          <li>No chores yet.</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   {% else %}
     <p>The household has not been initialized yet.</p>
   {% endif %}

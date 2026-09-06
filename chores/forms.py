@@ -1,8 +1,8 @@
-"""Forms for current-member selection and member management."""
+"""Forms for current-member selection, members, and normal chore fields."""
 
 from django import forms
 
-from chores.models import Member
+from chores.models import Chore, Member
 
 
 class CurrentMemberForm(forms.Form):
@@ -24,3 +24,17 @@ class MemberForm(forms.ModelForm):
     class Meta:
         model = Member
         fields = ("name",)
+
+
+class ChoreForm(forms.ModelForm):
+    class Meta:
+        model = Chore
+        fields = ("title", "description", "assignee", "due_date")
+        widgets = {"due_date": forms.DateInput(attrs={"type": "date"})}
+
+    def __init__(self, *args, household, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["assignee"].queryset = household.members.filter(
+            is_active=True
+        ).order_by("name", "pk")
+        self.fields["assignee"].empty_label = "Unassigned"

@@ -1,4 +1,4 @@
-"""Views for current-member selection and member management."""
+"""Views for current-member selection, member management, and chores."""
 
 from functools import wraps
 
@@ -8,8 +8,20 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from chores.current_member import CURRENT_MEMBER_SESSION_KEY
-from chores.forms import CurrentMemberForm, MemberForm
-from chores.models import Member
+from chores.forms import ChoreForm, CurrentMemberForm, MemberForm
+from chores.models import Chore, Member
+
+
+def current_member_required(view_function):
+    """Prompt for an active Current Member before accessing chore pages."""
+
+    @wraps(view_function)
+    def wrapped(request, *args, **kwargs):
+        if request.current_member is None:
+            return redirect("chores:home")
+        return view_function(request, *args, **kwargs)
+
+    return wrapped
 
 
 def leader_required(view_function):
@@ -44,7 +56,12 @@ def _member_management_context(request, **extra):
 
 @require_GET
 def home(request):
-    return render(request, "chores/home.html")
+    chores = Chore.objects.none()
+    if request.current_member is not None:
+        chores = Chore.objects.filter(
+            creator__household=request.household
+        ).order_by("-created_at", "-pk")
+    return render(request, "chores/home.html", {"chores": chores})
 
 
 @require_POST
@@ -138,3 +155,75 @@ def member_deactivate(request, member_id):
         )
 
     return redirect("chores:member_list")
+
+
+def _household_chore_or_404(request, chore_id):
+    return get_object_or_404(
+        Chore.objects.select_related("creator", "assignee"),
+        pk=chore_id,
+        creator__household=_household_or_404(request),
+    )
+
+
+def _can_edit_chore(request, chore):
+    member = request.current_member
+    return chore.status in (Chore.Status.OPEN, Chore.Status.IN_PROGRESS) and (
+        member.pk == chore.creator_id
+        or member.pk == chore.assignee_id
+        or member.pk == request.household.leader_id
+    )
+
+
+@require_http_methods(["GET", "POST"])
+@current_member_required
+def chore_create(request):
+    form = ChoreForm(
+        request.POST if request.method == "POST" else None,
+        household=_household_or_404(request),
+        instance=Chore(creator=request.current_member),
+    )
+    if request.method == "POST" and form.is_valid():
+        chore = form.save()
+        return redirect("chores:chore_detail", chore_id=chore.pk)
+
+    return render(
+        request,
+        "chores/chore_form.html",
+        {"form": form, "form_title": "Create chore"},
+        status=400 if request.method == "POST" else 200,
+    )
+
+
+@require_GET
+@current_member_required
+def chore_detail(request, chore_id):
+    chore = _household_chore_or_404(request, chore_id)
+    return render(
+        request,
+        "chores/chore_detail.html",
+        {"chore": chore, "can_edit": _can_edit_chore(request, chore)},
+    )
+
+
+@require_http_methods(["GET", "POST"])
+@current_member_required
+def chore_edit(request, chore_id):
+    chore = _household_chore_or_404(request, chore_id)
+    if not _can_edit_chore(request, chore):
+        raise PermissionDenied("You may not edit this chore.")
+
+    form = ChoreForm(
+        request.POST if request.method == "POST" else None,
+        household=request.household,
+        instance=chore,
+    )
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("chores:chore_detail", chore_id=chore.pk)
+
+    return render(
+        request,
+        "chores/chore_form.html",
+        {"form": form, "form_title": "Edit chore", "chore": chore},
+        status=400 if request.method == "POST" else 200,
+    )
