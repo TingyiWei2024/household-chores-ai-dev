@@ -1,0 +1,18 @@
+{% extends "chores/base.html" %}
+
+{% block title %}History{% endblock %}
+
+{% block content %}
+  <h2>History</h2>
+  <ul>
+    {% for chore in chores %}
+      <li>
+        <a href="{% url 'chores:chore_detail' chore.pk %}">{{ chore.title }}</a>
+        — Completed <time datetime="{{ chore.completed_at|date:'c' }}">{{ chore.completed_at|date:"Y-m-d H:i:s T" }}</time>
+        — <a href="{% url 'chores:chore_reuse' chore.pk %}">Reuse chore</a>
+      </li>
+    {% empty %}
+      <li>No completed chores yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

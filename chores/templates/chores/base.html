@@ -18,6 +18,10 @@
         </form>
         {% if current_member %}
           <p>Acting as: <strong>{{ current_member.name }}</strong></p>
+          <nav aria-label="Main navigation">
+            <a href="{% url 'chores:home' %}">Active board</a>
+            <a href="{% url 'chores:history' %}">History</a>
+          </nav>
           <p><a href="{% url 'chores:chore_create' %}">Create chore</a></p>
           {% if current_member.is_leader %}
             <p><a href="{% url 'chores:member_list' %}">Manage members</a></p>

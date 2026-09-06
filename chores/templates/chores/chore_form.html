@@ -4,12 +4,18 @@
 
 {% block content %}
   <h2>{{ form_title }}</h2>
+  {% if source_chore %}
+    <p>Create a new chore from <a href="{% url 'chores:chore_detail' source_chore.pk %}">{{ source_chore.title }}</a>.
+      The completed chore stays unchanged.</p>
+  {% endif %}
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Save</button>
+    <button type="submit">{% if source_chore %}Create chore{% else %}Save{% endif %}</button>
   </form>
-  {% if chore %}
+  {% if source_chore %}
+    <p><a href="{% url 'chores:chore_detail' source_chore.pk %}">Back to completed chore</a></p>
+  {% elif chore %}
     <p><a href="{% url 'chores:chore_detail' chore.pk %}">Back to chore</a></p>
   {% else %}
     <p><a href="{% url 'chores:home' %}">Back to home</a></p>

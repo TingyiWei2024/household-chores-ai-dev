@@ -28,6 +28,9 @@
   {% if can_edit %}
     <p><a href="{% url 'chores:chore_edit' chore.pk %}">Edit chore</a></p>
   {% endif %}
+  {% if can_reuse %}
+    <p><a href="{% url 'chores:chore_reuse' chore.pk %}">Reuse chore</a> to create a new chore.</p>
+  {% endif %}
   {% for action, label in workflow_actions %}
     <form method="post" action="{% url 'chores:chore_action' chore.pk %}">
       {% csrf_token %}

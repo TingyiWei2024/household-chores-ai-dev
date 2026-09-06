@@ -230,6 +230,7 @@ def _chore_detail_context(request, chore, **extra):
     return {
         "chore": chore,
         "can_edit": _can_edit_chore(request, chore),
+        "can_reuse": chore.status == Chore.Status.COMPLETED,
         "workflow_actions": available_chore_actions(chore, request.current_member),
         **extra,
     }
@@ -282,5 +283,56 @@ def chore_edit(request, chore_id):
         request,
         "chores/chore_form.html",
         {"form": form, "form_title": "Edit chore", "chore": chore},
+        status=400 if request.method == "POST" else 200,
+    )
+
+
+@require_GET
+@current_member_required
+def history(request):
+    chores = Chore.objects.filter(
+        creator__household=_household_or_404(request),
+        status=Chore.Status.COMPLETED,
+    ).order_by("-completed_at", "-pk")
+    return render(request, "chores/history.html", {"chores": chores})
+
+
+@require_http_methods(["GET", "POST"])
+@current_member_required
+def chore_reuse(request, chore_id):
+    # Fetch again on POST: a form opened before Undo is no longer eligible.
+    source = _household_chore_or_404(request, chore_id)
+    if source.status != Chore.Status.COMPLETED:
+        return render(
+            request,
+            "chores/chore_detail.html",
+            _chore_detail_context(
+                request, source, workflow_error="Only completed chores can be reused."
+            ),
+            status=400,
+        )
+    assignee = source.assignee
+    if assignee is not None and (
+        not assignee.is_active or assignee.household_id != request.household.pk
+    ):
+        assignee = None
+    form = ChoreForm(
+        request.POST if request.method == "POST" else None,
+        household=request.household,
+        instance=Chore(creator=request.current_member),
+        initial={
+            "title": source.title,
+            "description": source.description,
+            "assignee": assignee,
+            "due_date": source.due_date,
+        },
+    )
+    if request.method == "POST" and form.is_valid():
+        chore = form.save()
+        return redirect("chores:chore_detail", chore_id=chore.pk)
+    return render(
+        request,
+        "chores/chore_form.html",
+        {"form": form, "form_title": "Reuse chore", "source_chore": source},
         status=400 if request.method == "POST" else 200,
     )

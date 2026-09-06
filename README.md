@@ -66,8 +66,14 @@ current assignee or Leader can choose **Start work**, then **Complete chore**.
 The Leader can also progress an unassigned chore. Completion shows its timestamp.
 The current assignee or Leader can use **Undo completion** to return the same
 chore to In Progress, clear the completion timestamp, and restore normal editing.
-Completion removes the chore from the active board; Undo returns it. Until
-History is available, keep the completed chore's detail URL to revisit it.
+Completion moves the chore from the active board to **History**; Undo removes
+it from History and returns it to the active board.
+
+Any selected member can choose **Reuse chore** from History or a completed
+chore's detail. Review the prefilled title, description, assignee and due date;
+change or clear optional values, then choose **Create chore**. An inactive
+historical assignee is left unassigned. Reuse creates a distinct Open chore
+while preserving the completed source, unlike Undo which changes the same chore.
 
 ## Run tests
 
