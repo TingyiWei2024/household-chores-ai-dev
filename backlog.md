@@ -1,5 +1,27 @@
 # Shared Household Chores MVP — Implementation Backlog
 
+## Task-to-issue index
+
+Tasks 4–8 have been migrated to
+[GitHub Issues](https://github.com/TingyiWei2024/household-chores-ai-dev/issues),
+the only active execution queue. Use the mapped issues for current acceptance
+criteria, grooming, and execution status. This file is the homework/planning
+snapshot and task-to-issue index, not a second independently maintained backlog.
+[_docs/plan.md](_docs/plan.md) remains authoritative for approved product behavior.
+
+Tasks 1–3 are accepted. The migration does not start PM grooming, implementation,
+or the Task 4 pilot. The original task sections below are preserved unchanged.
+
+| Task | GitHub issue | Dependencies |
+| --- | --- | --- |
+| Task 4 | [#1 — Create, view, and edit chores with MVP permissions](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/1) | Accepted Task 3 |
+| Task 5 | [#2 — Implement claiming, status transitions, and Undo completion](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/2) | Task 4: [#1](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/1) |
+| Task 6 | [#3 — Build the shared active board, member filter, and indicators](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/3) | Task 5: [#2](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/2) |
+| Task 7 | [#4 — Add completed history and chore reuse](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/4) | Task 6: [#3](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/3) |
+| Task 8 | [#5 — Verify the complete MVP against the specification](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/5) | Accepted Tasks 1–3; Tasks 4–7: [#1](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/1), [#2](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/2), [#3](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/3), [#4](https://github.com/TingyiWei2024/household-chores-ai-dev/issues/4) |
+
+## Original homework/planning snapshot
+
 Tasks are ordered by dependency. Each task is intended to fit one focused coding-agent session.
 
 ## Task 1 — Bootstrap Django and prove the baseline
