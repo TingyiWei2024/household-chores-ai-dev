@@ -8,8 +8,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from chores.actions import available_chore_actions, perform_chore_action
+from chores.board import household_indicators
 from chores.current_member import CURRENT_MEMBER_SESSION_KEY
-from chores.forms import ChoreForm, CurrentMemberForm, MemberForm
+from chores.forms import BoardFilterForm, ChoreForm, CurrentMemberForm, MemberForm
 from chores.models import Chore, Member
 
 
@@ -55,14 +56,33 @@ def _member_management_context(request, **extra):
     return context
 
 
+def _board_context(request):
+    if request.current_member is None:
+        return {"chores": Chore.objects.none()}
+    board_filter = BoardFilterForm(request.GET, household=request.household)
+    chores = Chore.objects.filter(
+        creator__household=request.household
+    ).exclude(status=Chore.Status.COMPLETED).select_related("assignee")
+    if board_filter.is_valid():
+        member = board_filter.cleaned_data["member"]
+        if member is not None:
+            chores = chores.filter(assignee=member)
+    else:
+        chores = chores.none()
+    return {
+        "chores": chores.order_by("-created_at", "-pk"),
+        "board_filter": board_filter,
+        "indicators": household_indicators(request.household),
+    }
+
+
 @require_GET
 def home(request):
-    chores = Chore.objects.none()
-    if request.current_member is not None:
-        chores = Chore.objects.filter(
-            creator__household=request.household
-        ).order_by("-created_at", "-pk")
-    return render(request, "chores/home.html", {"chores": chores})
+    context = _board_context(request)
+    invalid_filter = "board_filter" in context and context["board_filter"].errors
+    return render(
+        request, "chores/home.html", context, status=400 if invalid_filter else 200
+    )
 
 
 @require_POST
@@ -80,7 +100,7 @@ def set_current_member(request):
     return render(
         request,
         "chores/home.html",
-        {"current_member_form": form},
+        {**_board_context(request), "current_member_form": form},
         status=400,
     )
 

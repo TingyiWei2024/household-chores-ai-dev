@@ -4,12 +4,35 @@
   {% if current_household %}
     <p>This is the shared page for {{ current_household.name }}.</p>
     {% if current_member %}
-      <h2>Chores</h2>
+      <h2>Active chores</h2>
+      <section aria-label="Household indicators">
+        <h3>This Week Completion Rate</h3>
+        <p>{{ indicators.week_start|date:"Y-m-d" }} through {{ indicators.week_end|date:"Y-m-d" }}</p>
+        {% if indicators.week_total %}
+          <p><strong>{{ indicators.completion_rate|floatformat:"-1" }}%</strong>
+            ({{ indicators.week_completed }} of {{ indicators.week_total }} due chores completed)</p>
+        {% else %}
+          <p>No chores due this week</p>
+        {% endif %}
+        <h3>Overdue Chores Count</h3>
+        <p><strong>{{ indicators.overdue_count }}</strong></p>
+      </section>
+      <form method="get" action="{% url 'chores:home' %}">
+        {{ board_filter.as_p }}
+        <button type="submit">Filter</button>
+        <a href="{% url 'chores:home' %}">Clear filter</a>
+      </form>
       <ul>
         {% for chore in chores %}
-          <li><a href="{% url 'chores:chore_detail' chore.pk %}">{{ chore.title }}</a></li>
+          <li>
+            <a href="{% url 'chores:chore_detail' chore.pk %}">{{ chore.title }}</a>
+            — {{ chore.get_status_display }}
+            — {% if chore.assignee %}{{ chore.assignee.name }}{% else %}Unassigned{% endif %}
+            — {% if chore.due_date %}Due {{ chore.due_date|date:"Y-m-d" }}{% else %}No due date{% endif %}
+            {% if chore.is_overdue %}<strong>Overdue</strong>{% endif %}
+          </li>
         {% empty %}
-          <li>No chores yet.</li>
+          <li>No active chores match this view.</li>
         {% endfor %}
       </ul>
     {% endif %}

@@ -49,7 +49,15 @@ add regular members. Select the member you want to act as, then choose **Create
 chore**. Enter a title, optionally fill in the description and due date, and
 choose an active assignee or **Unassigned**. Saving opens the chore's details.
 
-The home page links to household chore details. **Edit chore** is available to
+The home page shows the household's active board and links to chore details.
+**Filter by member** selects chores by their current assignee without changing
+Current Member. **Clear filter** restores all active chores. The **This Week
+Completion Rate** and **Overdue Chores Count** always describe the whole household.
+The completion rate counts chores due Monday through Sunday, including completed
+chores; without eligible chores it shows **No chores due this week**. Overdue
+means due before today and not completed.
+
+**Edit chore** is available to
 the creator, current assignee, or Leader while the chore is Open or In Progress.
 Other members can view its details. Completed chores' normal fields are read-only.
 
@@ -58,7 +66,8 @@ current assignee or Leader can choose **Start work**, then **Complete chore**.
 The Leader can also progress an unassigned chore. Completion shows its timestamp.
 The current assignee or Leader can use **Undo completion** to return the same
 chore to In Progress, clear the completion timestamp, and restore normal editing.
-History and board indicators are not yet available.
+Completion removes the chore from the active board; Undo returns it. Until
+History is available, keep the completed chore's detail URL to revisit it.
 
 ## Run tests
 

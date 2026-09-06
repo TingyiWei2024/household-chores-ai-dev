@@ -38,3 +38,18 @@ class ChoreForm(forms.ModelForm):
             is_active=True
         ).order_by("name", "pk")
         self.fields["assignee"].empty_label = "Unassigned"
+
+
+class BoardFilterForm(forms.Form):
+    member = forms.ModelChoiceField(
+        queryset=Member.objects.none(),
+        required=False,
+        empty_label="All members",
+        label="Filter by member",
+    )
+
+    def __init__(self, *args, household, **kwargs):
+        super().__init__(*args, auto_id="id_filter_%s", **kwargs)
+        # Filtering is read-only: inactive historical assignees remain valid
+        # filter choices, even though they cannot act or receive new assignments.
+        self.fields["member"].queryset = household.members.order_by("name", "pk")
