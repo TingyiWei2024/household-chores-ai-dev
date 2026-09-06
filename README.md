@@ -51,8 +51,14 @@ choose an active assignee or **Unassigned**. Saving opens the chore's details.
 
 The home page links to household chore details. **Edit chore** is available to
 the creator, current assignee, or Leader while the chore is Open or In Progress.
-Other members can view its details. Completed chores are read-only. This task
-does not yet provide claiming, status changes, History, or board indicators.
+Other members can view its details. Completed chores' normal fields are read-only.
+
+On an Open, unassigned chore, any selected member can choose **Claim**. The
+current assignee or Leader can choose **Start work**, then **Complete chore**.
+The Leader can also progress an unassigned chore. Completion shows its timestamp.
+The current assignee or Leader can use **Undo completion** to return the same
+chore to In Progress, clear the completion timestamp, and restore normal editing.
+History and board indicators are not yet available.
 
 ## Run tests
 

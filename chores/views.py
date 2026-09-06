@@ -7,6 +7,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from chores.actions import available_chore_actions, perform_chore_action
 from chores.current_member import CURRENT_MEMBER_SESSION_KEY
 from chores.forms import ChoreForm, CurrentMemberForm, MemberForm
 from chores.models import Chore, Member
@@ -201,8 +202,44 @@ def chore_detail(request, chore_id):
     return render(
         request,
         "chores/chore_detail.html",
-        {"chore": chore, "can_edit": _can_edit_chore(request, chore)},
+        _chore_detail_context(request, chore),
     )
+
+
+def _chore_detail_context(request, chore, **extra):
+    return {
+        "chore": chore,
+        "can_edit": _can_edit_chore(request, chore),
+        "workflow_actions": available_chore_actions(chore, request.current_member),
+        **extra,
+    }
+
+
+@require_POST
+@current_member_required
+def chore_action(request, chore_id):
+    chore = _household_chore_or_404(request, chore_id)
+    try:
+        if set(request.POST) - {"action", "csrfmiddlewaretoken"}:
+            raise ValidationError("Workflow actions do not accept chore field changes.")
+        perform_chore_action(
+            chore=chore,
+            member=request.current_member,
+            action=request.POST.get("action"),
+        )
+    except Chore.DoesNotExist:
+        raise Http404("The chore is no longer available.")
+    except ValidationError as error:
+        chore.refresh_from_db()
+        return render(
+            request,
+            "chores/chore_detail.html",
+            _chore_detail_context(
+                request, chore, workflow_error=" ".join(error.messages)
+            ),
+            status=400,
+        )
+    return redirect("chores:chore_detail", chore_id=chore.pk)
 
 
 @require_http_methods(["GET", "POST"])

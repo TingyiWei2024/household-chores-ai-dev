@@ -4,6 +4,9 @@
 
 {% block content %}
   <h2>{{ chore.title }}</h2>
+  {% if workflow_error %}
+    <p role="alert">{{ workflow_error }}</p>
+  {% endif %}
   <dl>
     <dt>Description</dt>
     <dd>{{ chore.description|default:"No description"|linebreaksbr }}</dd>
@@ -25,5 +28,11 @@
   {% if can_edit %}
     <p><a href="{% url 'chores:chore_edit' chore.pk %}">Edit chore</a></p>
   {% endif %}
+  {% for action, label in workflow_actions %}
+    <form method="post" action="{% url 'chores:chore_action' chore.pk %}">
+      {% csrf_token %}
+      <button type="submit" name="action" value="{{ action }}">{{ label }}</button>
+    </form>
+  {% endfor %}
   <p><a href="{% url 'chores:home' %}">Back to home</a></p>
 {% endblock %}
