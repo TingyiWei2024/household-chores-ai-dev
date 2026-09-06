@@ -1,7 +1,7 @@
 # Shared Household Chores
 
-This repository contains the minimal Django baseline for the Shared Household
-Chores MVP. The Django project package is `household_chores`, and the single
+This repository contains the Shared Household Chores MVP. The Django project
+package is `household_chores`, and the single
 application package is `chores`.
 
 ## Prerequisites
@@ -79,4 +79,14 @@ while preserving the completed source, unlike Undo which changes the same chore.
 
 ```shell
 uv run python manage.py test
+```
+
+The [MVP verification guide](_docs/verification.md) maps all 21 specification
+criteria to implementation and named tests. It also documents an isolated,
+committed-source setup check and a short browser acceptance walkthrough.
+
+```shell
+uv run python manage.py check
+uv run python manage.py makemigrations --check --dry-run
+git diff --check
 ```
